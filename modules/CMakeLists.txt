@@ -3,3 +3,4 @@ project(modules)
 
 
 add_subdirectory(s6i_result)
+add_subdirectory(s6i_sync)
