@@ -3,8 +3,8 @@ project(SDL_sandbox)
 
 
 # オプション設定
-option(SDL_SANDBOX_ENABLE_EXAMPLES "Enable examples" OFF)
 option(SDL_SANDBOX_ENABLE_TESTS "Enable unit tests" OFF)
+option(SDL_SANDBOX_ENABLE_EXAMPLES "Enable examples" OFF)
 
 
 # cpp_base （基本設定）
@@ -46,12 +46,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(imgui)
 
 
-# examples
-if(SDL_SANDBOX_ENABLE_EXAMPLES)
-    add_subdirectory(examples)
-endif()
-
-
 # tests
 if(SDL_SANDBOX_ENABLE_TESTS)
     # GoogleTest
@@ -66,4 +60,14 @@ if(SDL_SANDBOX_ENABLE_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     enable_testing()
+endif()
+
+
+# modules
+add_subdirectory(modules)
+
+
+# examples
+if(SDL_SANDBOX_ENABLE_EXAMPLES)
+    add_subdirectory(examples)
 endif()
