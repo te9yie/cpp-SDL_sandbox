@@ -25,7 +25,10 @@ class Mutex {
   template <typename... Args>
   static s6i_result::Result<Mutex<T>, SyncError> make(Args&&... args) {
     SDL_mutex* mutex = SDL_CreateMutex();
+    SDL_LogInfo(SDL_LOG_CATEGORY_SYSTEM, "Create mutex.");
     if (!mutex) {
+      SDL_LogError(SDL_LOG_CATEGORY_SYSTEM, "Failed to create mutex: %s",
+                   SDL_GetError());
       return s6i_result::make_err(SyncError::MutexCreationError);
     }
     return s6i_result::make_ok(Mutex(mutex, std::forward<Args>(args)...));
@@ -46,7 +49,10 @@ class Mutex {
     return *this;
   }
 
-  ~Mutex() { SDL_DestroyMutex(m_mutex); }
+  ~Mutex() {
+    SDL_LogInfo(SDL_LOG_CATEGORY_SYSTEM, "Destroy mutex.");
+    SDL_DestroyMutex(m_mutex);
+  }
 
   /**
    * @brief Mutexをロックし、保護された値へのアクセスを提供

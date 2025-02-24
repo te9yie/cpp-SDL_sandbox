@@ -15,7 +15,7 @@ target_compile_features(cpp_base INTERFACE cxx_std_17)
 
 ## 警告レベル最大、例外無効、RTTI無効
 target_compile_options(cpp_base INTERFACE
-    $<$<CXX_COMPILER_ID:MSVC>:/utf-8 /W4 /Wall /EHa- /GR->
+    $<$<CXX_COMPILER_ID:MSVC>:/utf-8 /W4 /EHa- /GR->
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic -fno-exceptions -fno-rtti>
 )
 target_compile_definitions(cpp_base INTERFACE

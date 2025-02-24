@@ -14,7 +14,7 @@ TEST(MutexTest, BasicFunctionality) {
   {
     auto guard_result = mutex.lock();
     ASSERT_TRUE(guard_result.is_ok());
-    auto& guard = guard_result.unwrap();
+    auto guard = guard_result.unwrap();
     EXPECT_EQ(*guard, 42);
     *guard = 100;
   }  // ここでアンロック
@@ -23,7 +23,7 @@ TEST(MutexTest, BasicFunctionality) {
   {
     auto guard_result = mutex.lock();
     ASSERT_TRUE(guard_result.is_ok());
-    auto& guard = guard_result.unwrap();
+    auto guard = guard_result.unwrap();
     EXPECT_EQ(*guard, 100);
   }
 }
@@ -37,7 +37,7 @@ TEST(MutexTest, ComplexType) {
   {
     auto guard_result = mutex.lock();
     ASSERT_TRUE(guard_result.is_ok());
-    auto& guard = guard_result.unwrap();
+    auto guard = guard_result.unwrap();
     EXPECT_EQ(*guard, "hello");
     guard->append(" world");
   }
@@ -45,7 +45,7 @@ TEST(MutexTest, ComplexType) {
   {
     auto guard_result = mutex.lock();
     ASSERT_TRUE(guard_result.is_ok());
-    auto& guard = guard_result.unwrap();
+    auto guard = guard_result.unwrap();
     EXPECT_EQ(*guard, "hello world");
   }
 }
@@ -60,7 +60,7 @@ TEST(MutexTest, MoveSemantics) {
   {
     auto guard_result = mutex2.lock();
     ASSERT_TRUE(guard_result.is_ok());
-    auto& guard = guard_result.unwrap();
+    auto guard = guard_result.unwrap();
     EXPECT_EQ(*guard, 42);
   }
 
@@ -73,7 +73,7 @@ TEST(MutexTest, MoveSemantics) {
   {
     auto guard_result = mutex2.lock();
     ASSERT_TRUE(guard_result.is_ok());
-    auto& guard = guard_result.unwrap();
+    auto guard = guard_result.unwrap();
     EXPECT_EQ(*guard, 100);
   }
 }
@@ -108,7 +108,7 @@ TEST(MutexTest, ThreadSafety) {
   {
     auto guard_result = mutex.lock();
     ASSERT_TRUE(guard_result.is_ok());
-    auto& guard = guard_result.unwrap();
+    auto guard = guard_result.unwrap();
     EXPECT_EQ(*guard, num_threads * iterations);
   }
 }
@@ -128,7 +128,7 @@ TEST(MutexTest, ErrorHandling) {
   // 有効なmutex2でのロック試行
   auto guard_result2 = mutex2.lock();
   ASSERT_TRUE(guard_result2.is_ok());
-  auto& guard = guard_result2.unwrap();
+  auto guard = guard_result2.unwrap();
   EXPECT_EQ(*guard, 42);
 }
 
