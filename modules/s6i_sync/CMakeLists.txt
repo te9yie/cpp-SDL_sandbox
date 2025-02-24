@@ -16,6 +16,7 @@ target_link_libraries(s6i_sync INTERFACE
 if(SDL_SANDBOX_ENABLE_TESTS)
     add_executable(${PROJECT_NAME}_tests
         tests/mutex_test.cpp
+        tests/cond_var_test.cpp
     )
     target_precompile_headers(${PROJECT_NAME}_tests PRIVATE tests/pch.h)
     target_link_libraries(${PROJECT_NAME}_tests PRIVATE

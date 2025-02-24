@@ -17,9 +17,11 @@ enum class SyncError {
   InvalidThreadError,   ///< 無効なスレッドへの操作
 
   // CondVar関連エラー
-  CondVarCreationError,  ///< 条件変数の作成に失敗
-  CondVarWaitError,      ///< 条件変数のwaitに失敗
-  CondVarSignalError,    ///< 条件変数のsignal/broadcastに失敗
+  CondVarCreationError,   ///< 条件変数の作成に失敗
+  CondVarWaitError,       ///< 条件変数のwaitに失敗
+  CondVarSignalError,     ///< 条件変数のsignalに失敗
+  CondVarBroadcastError,  ///< 条件変数のbroadcastに失敗
+  InvalidCondVarError,    ///< 無効な条件変数への操作
 };
 
 }  // namespace s6i_sync

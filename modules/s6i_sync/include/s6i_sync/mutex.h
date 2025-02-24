@@ -119,6 +119,8 @@ class MutexGuard {
   const T& operator*() const { return *m_value; }
   const T* operator->() const { return m_value; }
 
+  SDL_mutex* get_raw() const { return m_mutex; }
+
   void swap(MutexGuard& other) {
     using std::swap;
     swap(m_mutex, other.m_mutex);

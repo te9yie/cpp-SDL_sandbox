@@ -8,6 +8,26 @@
 - エラーハンドリングは `s6i_result::Result` を使用すること
 - `noexcept` 指定子は不要
 
+### メンバ変数の命名規則
+- メンバ変数は `m_` プレフィックスを付けること
+  ```cpp
+  class Example {
+  private:
+      int m_count = 0;
+      std::string m_name;
+  };
+  ```
+
+### メンバ変数は定義時に初期化
+- メンバ変数が定義時に初期化できる場合は、コンストラクタ構文で初期化すること
+  ```
+  class Example {
+  private:
+    int m_value = 10;
+    std::string* m_name = nullptr;
+  };
+  ```
+
 ## リソース管理
 
 ### RAIIの原則
@@ -27,34 +47,28 @@
   public:
       // ムーブコンストラクタ
       Resource(Resource&& other)
-          : resource_(nullptr) {
-          swap(*this, other);
+          : resource_(other.m_resource) {
+        other.m_resource = nullptr;
       }
       
       // ムーブ代入演算子
       Resource& operator=(Resource&& other) {
-          swap(*this, other);
+          Resource(std::move(other)).swap(*this);
           return *this;
       }
       
       // swap関数
-      friend void swap(Resource& first, Resource& second) {
+      void swap(Resource& other) {
           using std::swap;
-          swap(first.resource_, second.resource_);
+          swap(m_resource, other.m_resource);
       }
   private:
-      ResourceType* resource_;
+      ResourceType* m_resource = nullptr;
   };
-  ```
 
-### メンバ変数の命名規則
-- メンバ変数は `m_` プレフィックスを付けること
-  ```cpp
-  class Example {
-  private:
-      int m_count;
-      std::string m_name;
-  };
+  inline void swap(Resource& lhs, Resource& rhs) {
+    lhs.swap(rhs);
+  }
   ```
 
 ### エラーハンドリング
