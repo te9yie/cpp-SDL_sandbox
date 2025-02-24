@@ -82,31 +82,67 @@ class Result {
   bool is_err() const { return std::holds_alternative<Err<E>>(m_value); }
 
   /**
-   * @brief 成功値を取得
+   * @brief 成功値を取得（ムーブ）
    * @note 失敗値を保持している場合はassertで停止
    */
-  const T& unwrap() const {
+  T unwrap() {
     assert(is_ok() && "Called unwrap on an Err value");
-    return std::get<Ok<T>>(m_value).m_value;
+    return std::move(std::get<Ok<T>>(m_value).m_value);
   }
 
   /**
-   * @brief 成功値もしくはデフォルト値を取得
+   * @brief 成功値もしくはデフォルト値を取得（ムーブ）
    * @param default_value 失敗時に返す値
    */
-  T unwrap_or(T&& default_value) const {
+  T unwrap_or(T&& default_value) {
     if (is_ok()) {
-      return std::get<Ok<T>>(m_value).m_value;
+      return std::move(std::get<Ok<T>>(m_value).m_value);
     }
     return std::forward<T>(default_value);
   }
 
   /**
-   * @brief 失敗値を取得
+   * @brief 成功値への参照を取得
+   * @note 失敗値を保持している場合はassertで停止
+   */
+  T& ref_ok() {
+    assert(is_ok() && "Called ref_ok on an Err value");
+    return std::get<Ok<T>>(m_value).m_value;
+  }
+
+  /**
+   * @brief 成功値へのconst参照を取得
+   * @note 失敗値を保持している場合はassertで停止
+   */
+  const T& ref_ok() const {
+    assert(is_ok() && "Called ref_ok on an Err value");
+    return std::get<Ok<T>>(m_value).m_value;
+  }
+
+  /**
+   * @brief 失敗値を取得（ムーブ）
    * @note 成功値を保持している場合はassertで停止
    */
-  const E& unwrap_err() const {
+  E unwrap_err() {
     assert(is_err() && "Called unwrap_err on an Ok value");
+    return std::move(std::get<Err<E>>(m_value).m_value);
+  }
+
+  /**
+   * @brief 失敗値への参照を取得
+   * @note 成功値を保持している場合はassertで停止
+   */
+  E& ref_err() {
+    assert(is_err() && "Called ref_err on an Ok value");
+    return std::get<Err<E>>(m_value).m_value;
+  }
+
+  /**
+   * @brief 失敗値へのconst参照を取得
+   * @note 成功値を保持している場合はassertで停止
+   */
+  const E& ref_err() const {
+    assert(is_err() && "Called ref_err on an Ok value");
     return std::get<Err<E>>(m_value).m_value;
   }
 
@@ -115,11 +151,12 @@ class Result {
    * @param f 適用する関数
    */
   template <typename F>
-  auto map(F&& f) const -> Result<decltype(f(std::declval<T>())), E> {
-    if (is_ok()) {
-      return make_ok(f(std::get<Ok<T>>(m_value).m_value));
+  auto map(F&& f) -> Result<decltype(f(std::declval<T>())), E> {
+    Result self = std::move(*this);
+    if (self.is_ok()) {
+      return make_ok(f(std::get<Ok<T>>(self.m_value).m_value));
     }
-    return Err<E>(std::get<Err<E>>(m_value).m_value);
+    return Err<E>(std::get<Err<E>>(self.m_value).m_value);
   }
 
   /**
@@ -127,11 +164,38 @@ class Result {
    * @param f 適用する関数
    */
   template <typename F>
-  auto map_err(F&& f) const -> Result<T, decltype(f(std::declval<E>()))> {
-    if (is_err()) {
-      return make_err(f(std::get<Err<E>>(m_value).m_value));
+  auto map_err(F&& f) -> Result<T, decltype(f(std::declval<E>()))> {
+    Result self = std::move(*this);
+    if (self.is_err()) {
+      return make_err(f(std::get<Err<E>>(self.m_value).m_value));
     }
-    return Ok<T>(std::get<Ok<T>>(m_value).m_value);
+    return Ok<T>(std::get<Ok<T>>(self.m_value).m_value);
+  }
+
+  /**
+   * @brief 成功値に関数を適用
+   * @param f 適用する関数
+   */
+  template <typename F>
+  Result inspect_ok(F&& f) {
+    Result self = std::move(*this);
+    if (self.is_ok()) {
+      f(std::get<Ok<T>>(self.m_value).m_value);
+    }
+    return self;
+  }
+
+  /**
+   * @brief 失敗値に関数を適用
+   * @param f 適用する関数
+   */
+  template <typename F>
+  Result inspect_err(F&& f) {
+    Result self = std::move(*this);
+    if (self.is_err()) {
+      f(std::get<Err<E>>(self.m_value).m_value);
+    }
+    return self;
   }
 
   /**
@@ -139,11 +203,12 @@ class Result {
    * @param f Result<U, E>を返す関数
    */
   template <typename F>
-  auto and_then(F&& f) const -> decltype(f(std::declval<T>())) {
-    if (is_ok()) {
-      return f(std::get<Ok<T>>(m_value).m_value);
+  auto and_then(F&& f) -> decltype(f(std::declval<T>())) {
+    Result self = std::move(*this);
+    if (self.is_ok()) {
+      return f(std::get<Ok<T>>(self.m_value).m_value);
     }
-    return Err<E>(std::get<Err<E>>(m_value).m_value);
+    return Err<E>(std::get<Err<E>>(self.m_value).m_value);
   }
 };
 

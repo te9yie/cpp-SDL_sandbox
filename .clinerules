@@ -1,0 +1,63 @@
+# C++ コーディング規約
+
+## 基本方針
+
+### 例外とRTTIの禁止
+- 例外機能（try-catch）を使用しないこと
+- RTTI（dynamic_cast, typeid）を使用しないこと
+- エラーハンドリングは `s6i_result::Result` を使用すること
+- `noexcept` 指定子は不要
+
+## リソース管理
+
+### RAIIの原則
+- リソースの確保は初期化時に行い、解放はデストラクタで自動的に行うこと
+- スコープベースのリソース管理を徹底すること
+- 例:
+  - ファイルハンドル
+  - ミューテックス
+  - メモリ確保/解放
+  - その他システムリソース
+
+### ムーブセマンティクス
+- リソースを保持するクラスはムーブセマンティクスを適切に実装すること
+- Copy-and-swap Idiomを使用してムーブ代入演算子を実装すること
+  ```cpp
+  class Resource {
+  public:
+      // ムーブコンストラクタ
+      Resource(Resource&& other)
+          : resource_(nullptr) {
+          swap(*this, other);
+      }
+      
+      // ムーブ代入演算子
+      Resource& operator=(Resource&& other) {
+          swap(*this, other);
+          return *this;
+      }
+      
+      // swap関数
+      friend void swap(Resource& first, Resource& second) {
+          using std::swap;
+          swap(first.resource_, second.resource_);
+      }
+  private:
+      ResourceType* resource_;
+  };
+  ```
+
+### メンバ変数の命名規則
+- メンバ変数は `m_` プレフィックスを付けること
+  ```cpp
+  class Example {
+  private:
+      int m_count;
+      std::string m_name;
+  };
+  ```
+
+### エラーハンドリング
+- エラーは `s6i_result::Result` を使用して表現すること
+- 失敗する可能性のある操作は必ず `Result` で包むこと
+- 例外を使用せず、戻り値でエラーを表現すること
